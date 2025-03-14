@@ -27,7 +27,7 @@ public class MazeEscape {
     // Coordinate iniziali del giocatore
     private static int playerX = 0;
     private static int playerY = 0;
-    
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean escaped = false;
@@ -40,39 +40,62 @@ public class MazeEscape {
             char move = scanner.next().toUpperCase().charAt(0);
 
             try {
-                // Chiamare il metodo per muovere il giocatore
-                // Verificare se ha raggiunto l'uscita e terminare il gioco
+                movePlayer(move);
+                if (playerX == 4 && playerY == 4) {
+                    System.out.println("Congratulazioni! Hai trovato l'uscita!");
+                    escaped = true;
+                }
             } catch (OutOfBoundsException | WallCollisionException e) {
-                // Stampare il messaggio di errore dell'eccezione
+                System.out.println("Errore: " + e.getMessage());
             }
         }
-
         scanner.close();
     }
 
     /**
      * Metodo per spostare il giocatore all'interno del labirinto
-     * Deve controllare:
-     * - Se il movimento è fuori dai limiti → lancia OutOfBoundsException
-     * - Se il movimento porta su un muro ('#') → lancia WallCollisionException
-     * - Se il movimento è valido, aggiornare la posizione
      */
     private static void movePlayer(char direction) throws OutOfBoundsException, WallCollisionException {
-        // Dichiarare nuove variabili per la posizione dopo il movimento
-        
-        // Switch-case per aggiornare le nuove coordinate in base alla direzione
-        
-        // Controllare se il movimento è fuori dalla matrice e lanciare OutOfBoundsException
-        
-        // Controllare se il movimento porta su un muro e lanciare WallCollisionException
-        
-        // Aggiornare la matrice con la nuova posizione del giocatore
+        int newX = playerX;
+        int newY = playerY;
+
+        switch (direction) {
+            case 'W': newX--; break; // Su
+            case 'A': newY--; break; // Sinistra
+            case 'S': newX++; break; // Giù
+            case 'D': newY++; break; // Destra
+            default:
+                System.out.println("Mossa non valida! Usa W, A, S, D.");
+                return;
+        }
+
+        // Controllo dei limiti della matrice
+        if (newX < 0 || newX >= LABIRINTO.length || newY < 0 || newY >= LABIRINTO[0].length) {
+            throw new OutOfBoundsException("Sei fuori dai limiti del labirinto!");
+        }
+
+        // Controllo delle collisioni con i muri
+        if (LABIRINTO[newX][newY] == '#') {
+            throw new WallCollisionException("Hai colpito un muro! Scegli un'altra direzione.");
+        }
+
+        // Aggiornamento della matrice con la nuova posizione del giocatore
+        LABIRINTO[playerX][playerY] = '.'; // Liberare la posizione precedente
+        playerX = newX;
+        playerY = newY;
+        LABIRINTO[playerX][playerY] = 'P'; // Nuova posizione del giocatore
     }
 
     /**
      * Metodo per stampare il labirinto attuale
      */
     private static void printMaze() {
-        // Stampare la matrice riga per riga
+        for (char[] row : LABIRINTO) {
+            for (char cell : row) {
+                System.out.print(cell + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }
